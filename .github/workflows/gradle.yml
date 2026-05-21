@@ -1,4 +1,4 @@
-name: Java CI with Gradle
+name: Multi-Platform & Multi-Java CI
 
 on:
   push:
@@ -6,23 +6,29 @@ on:
   pull_request:
     branches: [ "main" ]
   schedule:
-    - cron: '30 09 * * 3'
-    - cron: '0 19 * * 5'
+    - cron: '30 12 * * 3'  # Среда 12:30 UTC
+    - cron: '0 22 * * 5'   # Пятница 22:00 UTC
+
 permissions:
   contents: read
 
 jobs:
   build-and-test:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        java-version: ['11', '13', '17']
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up JDK 11
+      - name: Set up JDK ${{ matrix.java-version }}
         uses: actions/setup-java@v4
         with:
-          java-version: '11'
+          java-version: ${{ matrix.java-version }}
           distribution: 'temurin'
 
       - name: Setup Gradle
